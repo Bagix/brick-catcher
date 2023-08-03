@@ -16,18 +16,49 @@ class Brick {
 
   move() {
     this.draw();
-    this.position.y += 2;
+    this.position.y += 3;
+  }
+
+  remove() {
+    c.clearRect(0, 0, 10, 10);
   }
 }
+
+class Player {
+  constructor(position) {
+    this.position = position;
+  }
+
+  draw() {
+    c.fillStyle = "#7FFF00";
+    c.fillRect(this.position.x, this.position.y, 100, 10);
+  }
+}
+const player = new Player({
+  x: canvas.width / 2 - 50,
+  y: canvas.height - 100,
+});
 
 function animate() {
   window.requestAnimationFrame(animate);
   c.fillStyle = "purple";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
+  player.draw();
+
   bricks.forEach((brick, index) => {
     brick.move();
+
     if (brick.position.y > canvas.height) {
+      bricks.splice(index, 1);
+    }
+
+    if (
+      brick.position.y == player.position.y &&
+      brick.position.x >= player.position.x &&
+      brick.position.x <= player.position.x + 100
+    ) {
+      brick.remove();
       bricks.splice(index, 1);
     }
   });
@@ -35,12 +66,27 @@ function animate() {
 
 (function () {
   setInterval(() => {
-    const rand = Math.floor(Math.random() * 100);
-    const positionX = (canvas.width / 100) * rand;
-    const brick = new Brick({ x: positionX, y: 0 });
-    bricks.push(brick);
-    brick.draw();
+    generateBrick();
   }, 3000);
 })();
+
+function generateBrick() {
+  const rand = Math.floor(Math.random() * 100);
+  const positionX = (canvas.width / 100) * rand;
+  const brick = new Brick({ x: positionX, y: 0 });
+  bricks.push(brick);
+  brick.draw();
+}
+
+window.addEventListener("keydown", (event) => {
+  switch (event.code) {
+    case "ArrowRight":
+      player.position.x += 10;
+      break;
+    case "ArrowLeft":
+      player.position.x -= 10;
+      break;
+  }
+});
 
 animate();
