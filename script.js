@@ -3,6 +3,8 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const c = canvas.getContext("2d");
 const bricks = [];
+let points = 0;
+const pointsElement = document.querySelector("#points");
 
 class Brick {
   constructor(position) {
@@ -20,7 +22,7 @@ class Brick {
   }
 
   remove() {
-    c.clearRect(0, 0, 10, 10);
+    c.clearRect(this.position.x, this.position.y, 10, 10);
   }
 }
 
@@ -33,7 +35,22 @@ class Player {
     c.fillStyle = "#7FFF00";
     c.fillRect(this.position.x, this.position.y, 100, 10);
   }
+
+  moveRight() {
+    if (this.position.x < canvas.width - 100) {
+      this.draw();
+      this.position.x += 10;
+    }
+  }
+
+  moveLeft() {
+    if (this.position.x > 0) {
+      this.draw();
+      this.position.x -= 10;
+    }
+  }
 }
+
 const player = new Player({
   x: canvas.width / 2 - 50,
   y: canvas.height - 100,
@@ -50,6 +67,7 @@ function animate() {
     brick.move();
 
     if (brick.position.y > canvas.height) {
+      brick.remove();
       bricks.splice(index, 1);
     }
 
@@ -60,6 +78,8 @@ function animate() {
     ) {
       brick.remove();
       bricks.splice(index, 1);
+      points++;
+      pointsElement.innerText = points;
     }
   });
 }
@@ -81,10 +101,10 @@ function generateBrick() {
 window.addEventListener("keydown", (event) => {
   switch (event.code) {
     case "ArrowRight":
-      player.position.x += 10;
+      player.moveRight();
       break;
     case "ArrowLeft":
-      player.position.x -= 10;
+      player.moveLeft();
       break;
   }
 });
